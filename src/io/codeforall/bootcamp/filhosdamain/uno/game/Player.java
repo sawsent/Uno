@@ -3,9 +3,7 @@ package io.codeforall.bootcamp.filhosdamain.uno.game;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
 
 import java.io.InputStream;
-
 import java.io.PrintStream;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,12 +36,11 @@ public class Player {
         return null;
     }
 
-    public List<Card> getHand() {
-        return hand;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
 
+    public List<Card> getHand() {
+        return this.hand;
     }
 }
