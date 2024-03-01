@@ -50,6 +50,9 @@ public class Game {
                 if (beforePlayEffect.equals(PLUS_2)) {
                     if (verifier.hasPlusTwo(player)) {
                         // option: wanna play or take +2?
+
+
+                        continue;
                     }
                     player.giveCard(deck.removeLast());
                     player.giveCard(deck.removeLast());
@@ -58,6 +61,7 @@ public class Game {
                 } else if (beforePlayEffect.equals(PLUS_4)) {
                     if (verifier.hasPlusFour(player)) {
                         // option: wanna play or take +4?
+
                     }
                     for (int i = 0; i < 4; i++) {
                         player.giveCard(deck.removeLast());
@@ -66,6 +70,7 @@ public class Game {
 
 
                 } else if (beforePlayEffect.equals(SKIP_TURN)) {
+
                     continue;
                 }
 

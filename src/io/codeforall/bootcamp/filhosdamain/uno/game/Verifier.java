@@ -5,10 +5,7 @@ import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect;
 
 public class Verifier {
     public boolean isValid(Card playerChoice, Card last) {
-        if (last.getColor() == playerChoice.getColor() || last.getValue() == playerChoice.getValue()) {
-            return true;
-        }
-        if (last.getBeforePlayEffect() != Effect.PLUS_2 && playerChoice.getColor() == Color.BLACK) {
+        if (last.getColor() == playerChoice.getColor() || last.getValue() == playerChoice.getValue() || playerChoice.getColor() == Color.BLACK) {
             return true;
         }
         return false;
