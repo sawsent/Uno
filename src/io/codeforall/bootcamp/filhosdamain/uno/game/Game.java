@@ -8,6 +8,7 @@ import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -25,7 +26,7 @@ public class Game {
         this.messageSender = messageSender;
     }
 
-    public boolean addPlayer(String name, InputStream in, OutputStream out) {
+    public boolean addPlayer(String name, InputStream in, PrintStream out) {
         return players.add(new Player(name, in, out));
     }
 
