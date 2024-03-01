@@ -47,12 +47,22 @@ public class Game {
                 topCard = deck.getFirst();
 
                 if (beforePlayEffect.equals(PLUS_2)) {
-                    // verify if player has +2 card
-                    // option: wanna play or take +2?
+                    if (verifier.hasPlusTwo(player)) {
+                        // option: wanna play or take +2?
+                    }
+                    player.giveCard(deck.removeLast());
+                    player.giveCard(deck.removeLast());
+                    continue;
 
                 } else if (beforePlayEffect.equals(PLUS_4)) {
-                    // verify if player has +4 card
-                    // option: wanna play or take +4?
+                    if (verifier.hasPlusFour(player)) {
+                        // option: wanna play or take +4?
+                    }
+                    for (int i = 0; i < 4; i++) {
+                        player.giveCard(deck.removeLast());
+                    }
+                    continue;
+
 
                 } else if (beforePlayEffect.equals(SKIP_TURN)) {
                     continue;
@@ -76,7 +86,6 @@ public class Game {
 
 
             }
-
 
 
         }
@@ -117,12 +126,11 @@ public class Game {
 
     private void assignInitialCards() {
         for (Player player : players) {
-            for (int i=0; i<7;i++) {
+            for (int i = 0; i < 7; i++) {
                 player.giveCard(deck.removeLast());
             }
         }
     }
-
 
 
 }
