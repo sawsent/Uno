@@ -35,4 +35,9 @@ public class SpecialCard implements Card {
     public Color getColor() {
         return color;
     }
+
+    @Override
+    public String repr() {
+        return color.ASCII_CODE + ((beforePlayEffect == Effect.NO_EFFECT) ? afterPlayEffect.repr : beforePlayEffect.repr) + Color.RESET;
+    }
 }

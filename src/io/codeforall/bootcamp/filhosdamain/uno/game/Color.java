@@ -1,9 +1,17 @@
 package io.codeforall.bootcamp.filhosdamain.uno.game;
 
 public enum Color {
-    YELLOW,
-    RED,
-    GREEN,
-    BLUE,
-    BLACK;
+    YELLOW("\u001b[33m"),
+    RED("\u001b[31m"),
+    GREEN("\u001b[32m"),
+    BLUE("\u001b[36m"),
+    BLACK("\u001b[30m"),
+    WHITE("\u001b[37m"),
+    CYAN("\u001b[36m");
+
+    public static final String RESET = "\u001b[0m";
+    public final String ASCII_CODE;
+    Color(String colorCode) {
+        this.ASCII_CODE = colorCode;
+    }
 }

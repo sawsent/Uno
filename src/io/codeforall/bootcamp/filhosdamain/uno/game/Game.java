@@ -4,7 +4,9 @@ import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.DeckFactory;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.SpecialCard;
+import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender.MessageBuilder;
 import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender;
+import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,6 +14,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import static io.codeforall.bootcamp.filhosdamain.uno.Utils.STARTING_HAND_SIZE;
 import static io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect.*;
 
 public class Game {
@@ -38,8 +41,10 @@ public class Game {
         Effect afterPlayEffect = Effect.NO_EFFECT;
 
         Card topCard;
+        boolean gameEnded = false;
+        Player winner = null;
 
-        while (true) {
+        while (!gameEnded) {
 
 
             for (Player player : players) {
@@ -49,13 +54,18 @@ public class Game {
 
                 if (beforePlayEffect.equals(PLUS_2)) {
                     if (verifier.hasPlusTwo(player)) {
-                        // option: wanna play or take +2?
 
+                        MenuInputScanner w = new MenuInputScanner(new String[] {"Play +2", "Take 2 cards"});
+                        w.setMessage("What you wanna do brother?");
 
-                        continue;
+                        int input = player.getInput(w);
+                        if (input == 1) {
+                            continue;
+                        }
                     }
                     player.giveCard(deck.removeLast());
                     player.giveCard(deck.removeLast());
+                    beforePlayEffect = NO_EFFECT;
                     continue;
 
                 } else if (beforePlayEffect.equals(PLUS_4)) {
@@ -70,7 +80,7 @@ public class Game {
 
 
                 } else if (beforePlayEffect.equals(SKIP_TURN)) {
-
+                    beforePlayEffect = NO_EFFECT;
                     continue;
                 }
 
@@ -78,6 +88,7 @@ public class Game {
                 Card playedCard = getCard(player, topCard);
 
                 deck.addFirst(playedCard);
+                player.getHand().remove(playedCard);
 
                 beforePlayEffect = playedCard.getBeforePlayEffect();
                 afterPlayEffect = playedCard.getAfterPlayEffect();
@@ -86,15 +97,22 @@ public class Game {
                     players.reverse(player);
                     break;
                 } else if (afterPlayEffect.equals(SET_COLOR)) {
-                    Color color = player.getColor();
+                    Color color = player.chooseColor();
                     ((SpecialCard) playedCard).setColor(color);
                 }
 
+                if (player.getHand().size() == 0) {
+                    winner = player;
+                    gameEnded = true;
+                    break;
+                }
 
             }
 
 
         }
+
+        messageSender.sendMessage(messageSender.getMessageBuilder("wins!").addPrefix(winner.getName()).addReceivers(players).getMessage());
 
     }
 
@@ -103,7 +121,6 @@ public class Game {
         Choice playerChoice = null;
 
         while (!valid) {
-            // print some message
 
             playerChoice = player.choose();
 
@@ -113,7 +130,12 @@ public class Game {
             }
 
             // PLAYER TOOK A CARD.
-            player.giveCard(deck.removeLast());
+            if (player.getHand().size() < 40) {
+                player.giveCard(deck.removeLast());
+                continue;
+            }
+            messageSender.sendMessage(messageSender.getMessageBuilder("You have too many cards. Please play.").setColor(Color.RED).addReceiver(player.getPrintStream()).getMessage());
+
 
         }
         return playerChoice.card;
@@ -124,7 +146,11 @@ public class Game {
         Collections.shuffle(deck);
         Collections.shuffle(players);
         assignInitialCards();
-
+        messageSender.sendMessage((messageSender.getMessageBuilder("Pick a card! ").addPrefix(players.get(0).getName() + ":").setColor(Color.RED).addReceiver(players.get(0).getPrintStream()).getMessage()));
+        for (Card c : deck) {
+            System.out.println(c.repr());
+        }
+        System.out.println(deck.size());
         // message goes here \/
 
 
@@ -132,7 +158,7 @@ public class Game {
 
     private void assignInitialCards() {
         for (Player player : players) {
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < STARTING_HAND_SIZE; i++) {
                 player.giveCard(deck.removeLast());
             }
         }

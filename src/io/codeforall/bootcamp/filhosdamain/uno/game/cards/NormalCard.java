@@ -31,4 +31,9 @@ public class NormalCard implements Card {
     public Color getColor() {
         return color;
     }
+
+    @Override
+    public String repr() {
+        return color.ASCII_CODE + value + Color.RESET;
+    }
 }

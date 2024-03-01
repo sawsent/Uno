@@ -10,9 +10,14 @@ public class Choice {
         this.type = type;
         this.card = card;
     }
+    public Choice(Type type) {
+        this.type = type;
+        this.card = null;
+    }
 
     enum Type {
         TAKE_CARD,
         PLAY_CARD;
     }
+
 }

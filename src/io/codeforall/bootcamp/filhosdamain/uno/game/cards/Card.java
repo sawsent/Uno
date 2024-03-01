@@ -8,5 +8,6 @@ public interface Card {
     Effect getAfterPlayEffect();
     int getValue();
     Color getColor();
+    String repr();
 
 }
