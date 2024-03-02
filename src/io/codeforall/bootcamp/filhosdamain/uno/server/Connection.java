@@ -1,7 +1,7 @@
 package io.codeforall.bootcamp.filhosdamain.uno.server;
 
 import io.codeforall.bootcamp.filhosdamain.uno.Utils;
-import io.codeforall.bootcamp.filhosdamain.uno.game.Message;
+import io.codeforall.bootcamp.filhosdamain.uno.messages.Message;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
@@ -48,13 +48,6 @@ public class Connection implements Runnable {
         playerName = prompt.getUserInput(askName);
 
         while (true) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            Utils.emptyStream(in);
 
             int choice = prompt.getUserInput(getCommand);
             if (choice == 1) {

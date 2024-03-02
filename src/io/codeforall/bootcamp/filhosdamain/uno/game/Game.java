@@ -4,12 +4,9 @@ import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.DeckFactory;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.SpecialCard;
-import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender.MessageBuilder;
-import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,15 +16,10 @@ import static io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect.*;
 
 public class Game {
 
-    private final MessageSender messageSender;
+
     private PlayerList players = new PlayerList();
-    private final LinkedList<Card> deck = DeckFactory.getDeck();
+    private LinkedList<Card> deck;
     private final Verifier verifier = new Verifier();
-
-
-    public Game(MessageSender messageSender) {
-        this.messageSender = messageSender;
-    }
 
     public boolean addPlayer(String name, InputStream in, PrintStream out) {
         return players.add(new Player(name, in, out));
@@ -60,6 +52,9 @@ public class Game {
 
                         int input = player.getInput(w);
                         if (input == 1) {
+
+
+
                             continue;
                         }
                     }
@@ -112,7 +107,7 @@ public class Game {
 
         }
 
-        messageSender.sendMessage(messageSender.getMessageBuilder("wins!").addPrefix(winner.getName()).addReceivers(players).getMessage());
+
 
     }
 
@@ -134,7 +129,6 @@ public class Game {
                 player.giveCard(deck.removeLast());
                 continue;
             }
-            messageSender.sendMessage(messageSender.getMessageBuilder("You have too many cards. Please play.").setColor(Color.RED).addReceiver(player.getPrintStream()).getMessage());
 
 
         }
@@ -143,10 +137,13 @@ public class Game {
 
 
     private void prepare() {
+
+        deck = DeckFactory.getDeck(players.size());
+
         Collections.shuffle(deck);
         Collections.shuffle(players);
         assignInitialCards();
-        messageSender.sendMessage((messageSender.getMessageBuilder("Pick a card! ").addPrefix(players.get(0).getName() + ":").setColor(Color.RED).addReceiver(players.get(0).getPrintStream()).getMessage()));
+
         for (Card c : deck) {
             System.out.println(c.repr());
         }

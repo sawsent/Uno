@@ -1,7 +1,7 @@
 package io.codeforall.bootcamp.filhosdamain.uno.server;
 
 import io.codeforall.bootcamp.filhosdamain.uno.game.Game;
-import io.codeforall.bootcamp.filhosdamain.uno.game.Message;
+import io.codeforall.bootcamp.filhosdamain.uno.messages.Message;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -16,13 +16,16 @@ public class Server {
     private final ServerSocket serverSocket;
     private final List<Connection> connections = new LinkedList<>();
     private final ExecutorService connectionManager = Executors.newFixedThreadPool(6);
-    private final MessageSender messageSender = new MessageSender();
     private Game game;
 
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         awaitCommands();
         awaitPlayers();
+    }
+
+    private boolean canStart() {
+        return allPlayersReady() && connections.size() > 1;
     }
 
     private boolean allPlayersReady() {
@@ -52,7 +55,7 @@ public class Server {
                         }
                     }
                     case "start" -> {
-                        if (allPlayersReady()) {
+                        if (canStart()) {
                             startGame();
                             gameStarted = true;
                             break;
@@ -89,7 +92,7 @@ public class Server {
 
     private void startGame() {
         Thread t = new Thread(() -> {
-            this.game = new Game(messageSender);
+            this.game = new Game();
             for (Connection c : connections) {
                 game.addPlayer(c.getPlayerName(), c.in, c.out);
             }

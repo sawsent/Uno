@@ -12,6 +12,7 @@ public class DeckFactory {
 
     public static LinkedList<Card> getDeck() {
 
+
         LinkedList<Card> deck = new LinkedList<>();
 
         for (Color color : new Color[]{YELLOW, RED, GREEN, BLUE}) {
@@ -36,6 +37,15 @@ public class DeckFactory {
 
         }
 
+        return deck;
+    }
+
+    public static LinkedList<Card> getDeck(int nrOfPlayers) {
+        LinkedList<Card> deck = new LinkedList<>();
+
+        for (double i = 0; i < nrOfPlayers / 6.0; i++) {
+            deck.addAll(getDeck());
+        }
         return deck;
     }
 }
