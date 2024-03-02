@@ -2,6 +2,7 @@ package io.codeforall.bootcamp.filhosdamain.uno.game.cards;
 
 import io.codeforall.bootcamp.filhosdamain.uno.game.Color;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,16 +25,16 @@ public class DeckFactory {
             }
 
             for (int i = 0; i < 2; i++) {
-                deck.add(new SpecialCard(color, NO_EFFECT, REVERSE));
-                deck.add(new SpecialCard(color, PLUS_2, NO_EFFECT));
-                deck.add(new SpecialCard(color, SKIP_TURN, NO_EFFECT));
+                deck.add(new SpecialCard(-1, color, NO_EFFECT, REVERSE));
+                deck.add(new SpecialCard(-2, color, PLUS_2, NO_EFFECT));
+                deck.add(new SpecialCard(-3, color, SKIP_TURN, NO_EFFECT));
             }
 
         }
 
         for (int i = 0; i < 4; i++) {
-            deck.add(new SpecialCard(BLACK, PLUS_4, SET_COLOR));
-            deck.add(new SpecialCard(BLACK, NO_EFFECT, SET_COLOR));
+            deck.add(new SpecialCard(-4, BLACK, PLUS_4, SET_COLOR));
+            deck.add(new SpecialCard(-5, BLACK, NO_EFFECT, SET_COLOR));
 
         }
 
@@ -45,6 +46,15 @@ public class DeckFactory {
 
         for (double i = 0; i < nrOfPlayers / 6.0; i++) {
             deck.addAll(getDeck());
+        }
+        return deck;
+    }
+
+    public static LinkedList<Card> getShuffledDeck(int nrOfPlayers) {
+        LinkedList<Card> deck = getDeck(nrOfPlayers);
+        Collections.shuffle(deck);
+        while (deck.getFirst().getAfterPlayEffect() == SET_COLOR) {
+            deck.addLast(deck.removeFirst());
         }
         return deck;
     }

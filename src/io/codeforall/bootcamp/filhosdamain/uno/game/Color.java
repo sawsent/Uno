@@ -10,9 +10,9 @@ public enum Color {
     CYAN("\u001b[36m");
 
     public static final String RESET = "\u001b[0m";
-    public final String ASCII_CODE;
+    public final String ANSI_CODE;
     Color(String colorCode) {
-        this.ASCII_CODE = colorCode;
+        this.ANSI_CODE = colorCode;
     }
 
     public static Color convertToCardColor(int input) {

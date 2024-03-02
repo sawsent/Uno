@@ -2,8 +2,9 @@ package io.codeforall.bootcamp.filhosdamain.uno.game;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class PlayerList extends LinkedList<Player> {
+public class PlayerList extends CopyOnWriteArrayList<Player> {
 
     public void reverse(Player player) {
         List<Player> correctOrder = new LinkedList<>();
@@ -18,7 +19,9 @@ public class PlayerList extends LinkedList<Player> {
             correctOrder.add(this.remove(currentIndex));
         }
 
-        this.addAll(correctOrder);
+        for (Player p : correctOrder) {
+            this.add(p);
+        }
 
     }
 

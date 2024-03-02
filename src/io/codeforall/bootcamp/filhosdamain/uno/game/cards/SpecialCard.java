@@ -6,8 +6,10 @@ public class SpecialCard implements Card {
     private Color color;
     private final Effect beforePlayEffect;
     private final Effect afterPlayEffect;
+    private final int value;
 
-    public SpecialCard(Color color, Effect beforePlayEffect, Effect afterPlayEffect) {
+    public SpecialCard(int value, Color color, Effect beforePlayEffect, Effect afterPlayEffect) {
+        this.value = value;
         this.color = color;
         this.beforePlayEffect = beforePlayEffect;
         this.afterPlayEffect = afterPlayEffect;
@@ -28,7 +30,7 @@ public class SpecialCard implements Card {
 
     @Override
     public int getValue() {
-        return -1;
+        return value;
     }
 
     @Override
@@ -38,6 +40,6 @@ public class SpecialCard implements Card {
 
     @Override
     public String repr() {
-        return color.ASCII_CODE + ((beforePlayEffect == Effect.NO_EFFECT) ? afterPlayEffect.repr : beforePlayEffect.repr) + Color.RESET;
+        return color.ANSI_CODE + ((beforePlayEffect == Effect.NO_EFFECT) ? afterPlayEffect.repr : beforePlayEffect.repr) + Color.RESET;
     }
 }

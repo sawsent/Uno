@@ -1,7 +1,6 @@
 package io.codeforall.bootcamp.filhosdamain.uno.prompts;
 
 import io.codeforall.bootcamp.filhosdamain.uno.game.Player;
-import io.codeforall.bootcamp.filhosdamain.uno.messages.Hand;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 
 public class ChooseColor implements InputGetter {

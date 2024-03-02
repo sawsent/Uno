@@ -4,10 +4,10 @@ import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.DeckFactory;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Effect;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.SpecialCard;
-import io.codeforall.bootcamp.filhosdamain.uno.messages.CannotDraw;
-import io.codeforall.bootcamp.filhosdamain.uno.messages.DrewCards;
+import io.codeforall.bootcamp.filhosdamain.uno.messages.*;
 import io.codeforall.bootcamp.filhosdamain.uno.prompts.DrawOrPlay;
 import io.codeforall.bootcamp.filhosdamain.uno.prompts.InputGetter;
+import io.codeforall.bootcamp.filhosdamain.uno.server.MessageSender;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -25,6 +25,16 @@ public class Game {
     private LinkedList<Card> deck;
     private final Verifier verifier = new Verifier();
 
+    private Effect beforePlayEffect = Effect.NO_EFFECT;
+    private Effect afterPlayEffect;
+
+    private Card topCard;
+    private boolean gameEnded = false;
+    private Player winner = null;
+    private boolean canDraw;
+    private Verifier.Restriction restriction;
+    private int cardsToEat = 0;
+
     public boolean addPlayer(String name, InputStream in, PrintStream out) {
         return players.add(new Player(name, in, out));
     }
@@ -33,46 +43,24 @@ public class Game {
     public void run() {
         prepare();
 
-        Effect beforePlayEffect = Effect.NO_EFFECT;
-        Effect afterPlayEffect = Effect.NO_EFFECT;
 
-        Card topCard;
-        boolean gameEnded = false;
-        Player winner = null;
-        boolean canDraw;
-        Verifier.Restriction restriction;
 
         while (!gameEnded) {
             for (Player player : players) {
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 canDraw = true;
                 restriction = NO_RESTRICTION;
-
-                // print board to all players
                 topCard = deck.getFirst();
 
-                if (beforePlayEffect.equals(PLUS_2)) {
-                    if (tookPlus2(player)) {
-                        giveCards(player, 2);
-                        beforePlayEffect = NO_EFFECT;
-                        (new DrewCards()).send();
-                        continue;
-                    }
-                    restriction = ONLY_PLUS_2;
-                    canDraw = false;
-                }
-                if (beforePlayEffect.equals(PLUS_4)) {
-                    if (tookPlus4(player)) {
-                        giveCards(player, 4);
-                        beforePlayEffect = NO_EFFECT;
-                        (new DrewCards()).send();
-                        continue;
-                    }
-                    restriction = ONLY_PLUS_4;
-                    canDraw = false;
-                }
+                MessageSender.send(new ClearTerminal(players), new ShowBoard(players, player, topCard, "all"));
 
-                if (beforePlayEffect.equals(SKIP_TURN)) {
-                    beforePlayEffect = NO_EFFECT;
+                if (manageBeforePlayEffect(player)) {
                     continue;
                 }
 
@@ -84,22 +72,71 @@ public class Game {
                 beforePlayEffect = playedCard.getBeforePlayEffect();
                 afterPlayEffect = playedCard.getAfterPlayEffect();
 
-                if (afterPlayEffect.equals(REVERSE)) {
-                    players.reverse(player);
-
-                } else if (afterPlayEffect.equals(SET_COLOR)) {
-                    Color color = player.chooseColor();
-                    ((SpecialCard) playedCard).setColor(color);
-                }
-
                 if (player.getHand().size() == 0) {
                     winner = player;
                     gameEnded = true;
                     break;
                 }
+
+                if (manageAfterPlayEffect(player, playedCard)) {
+                    break;
+                }
             }
         }
+        MessageSender.send(new ShowWinner(players, winner));
+        System.out.println("Game ended. Winner: " + winner.getName());
+        System.exit(1);
+    }
 
+    private boolean manageAfterPlayEffect(Player player, Card playedCard) {
+        if (afterPlayEffect.equals(REVERSE)) {
+            players.reverse(player);
+            MessageSender.send(new ShowOrderReversed(players));
+            return true;
+        }
+
+        if (afterPlayEffect.equals(SET_COLOR)) {
+            Color color = player.chooseColor();
+            ((SpecialCard) playedCard).setColor(color);
+        }
+        return false;
+    }
+
+    private boolean manageBeforePlayEffect(Player player) {
+        if (beforePlayEffect.equals(PLUS_2)) {
+            cardsToEat += 2;
+            if (tookPlus2(player)) {
+                giveCards(player, cardsToEat);
+                beforePlayEffect = NO_EFFECT;
+
+                MessageSender.send(new ShowDrewCards(players, player, cardsToEat));
+                cardsToEat = 0;
+                return true;
+            }
+            restriction = ONLY_PLUS_2;
+            canDraw = false;
+        }
+
+        if (beforePlayEffect.equals(PLUS_4)) {
+            cardsToEat += 4;
+            if (tookPlus4(player)) {
+                giveCards(player, cardsToEat);
+                beforePlayEffect = NO_EFFECT;
+                MessageSender.send(new ShowDrewCards(players, player, cardsToEat));
+                cardsToEat = 0;
+                return true;
+            }
+
+            restriction = ONLY_PLUS_4;
+            canDraw = false;
+        }
+
+        if (beforePlayEffect.equals(SKIP_TURN)) {
+            MessageSender.send(new ShowTurnSkipped(players, player));
+            beforePlayEffect = NO_EFFECT;
+            return true;
+        }
+        return false;
     }
 
     private boolean tookPlus4(Player player) {
@@ -120,29 +157,30 @@ public class Game {
     }
 
     private Card getCard(Player player, Card topCard, boolean canDraw, Verifier.Restriction restriction) {
-        boolean valid = false;
-        Choice playerChoice = null;
+        Choice playerChoice;
 
-        while (!valid) {
+        while (true) {
 
             playerChoice = player.choose();
 
             if (playerChoice.type == Choice.Type.PLAY_CARD) {
-                valid = verifier.isValid(playerChoice.card, topCard, restriction);
+
+                if (verifier.isValid(playerChoice.card, topCard, restriction)) {
+                    break;
+                }
+
+                MessageSender.send(new ClearTerminal(player), new ShowBoard(players, player, topCard, "solo"), new ShowCardNotValid(player, playerChoice.card));
                 continue;
             }
 
-            // PLAYER TOOK A CARD.
             if (player.getHand().size() < 40 && canDraw && deck.size() > 1) {
                 player.giveCard(deck.removeLast());
 
-                (new DrewCards()).send();
-
+                MessageSender.send(new ClearTerminal(player), new ShowBoard(players, player, topCard, "solo"), new ShowDrewCards(players, player, 1));
                 continue;
             }
 
-            (new CannotDraw(player)).send();
-
+            MessageSender.send(new ClearTerminal(player), new ShowBoard(players, player, topCard, "solo"), new ShowCannotDraw(player));
         }
         return playerChoice.card;
     }
@@ -156,18 +194,12 @@ public class Game {
 
     private void prepare() {
 
-        deck = DeckFactory.getDeck(players.size());
+        deck = DeckFactory.getShuffledDeck(players.size());
 
-        Collections.shuffle(deck);
         Collections.shuffle(players);
         assignInitialCards();
 
-        for (Card c : deck) {
-            System.out.println(c.repr());
-        }
-        System.out.println(deck.size());
-        // message goes here \/
-
+        MessageSender.send(new ShowGameStarted(players));
 
     }
 

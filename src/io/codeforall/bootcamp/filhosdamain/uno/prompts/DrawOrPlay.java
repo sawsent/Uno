@@ -27,7 +27,7 @@ public class DrawOrPlay implements InputGetter {
     private String[] buildOptions(int cardsToDraw, String mandatoryCardType) {
 
         String playCardOption = "Play " + mandatoryCardType + " card.";
-        String drawCardOption = "Draw " + cardsToDraw + ((cardsToDraw == 1) ? "card." : "cards.");
+        String drawCardOption = "Draw " + cardsToDraw + ((cardsToDraw == 1) ? " card." : " cards.");
 
         return new String[]{playCardOption, drawCardOption};
     }
