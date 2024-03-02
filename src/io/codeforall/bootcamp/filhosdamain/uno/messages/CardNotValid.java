@@ -12,13 +12,10 @@ public class CardNotValid implements Message {
 
     }
 
-    private
+    //private
 
     @Override
     public void send() {
-        Thread t = new Thread(() -> {
 
-        });
-        t.start();
     }
 }

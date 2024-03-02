@@ -25,7 +25,18 @@ public class Server {
     }
 
     private boolean canStart() {
-        return allPlayersReady() && connections.size() > 1;
+
+        if (!allPlayersReady()) {
+            System.out.println("Not all players are ready!");
+            return false;
+        }
+
+        if (connections.size() <= 1) {
+            System.out.println("Not enough players have joined! (" + connections.size() + " joined, minimum 2)");
+            return false;
+        }
+
+        return true;
     }
 
     private boolean allPlayersReady() {
@@ -58,9 +69,7 @@ public class Server {
                         if (canStart()) {
                             startGame();
                             gameStarted = true;
-                            break;
                         }
-                        System.out.println("Not all players are ready! ");
                     }
                 }
             }

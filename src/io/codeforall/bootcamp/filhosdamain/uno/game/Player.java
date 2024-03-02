@@ -2,6 +2,10 @@ package io.codeforall.bootcamp.filhosdamain.uno.game;
 
 import io.codeforall.bootcamp.filhosdamain.uno.Utils;
 import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
+import io.codeforall.bootcamp.filhosdamain.uno.prompts.ChooseCard;
+import io.codeforall.bootcamp.filhosdamain.uno.prompts.ChooseColor;
+import io.codeforall.bootcamp.filhosdamain.uno.prompts.DrawOrPlay;
+import io.codeforall.bootcamp.filhosdamain.uno.prompts.InputGetter;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
@@ -31,48 +35,42 @@ public class Player {
         return out;
     }
 
-    public Card getCard() {
-        return null;
-    }
-
     public String getName() {
         return name;
     }
 
     public Choice choose() {
-        MenuInputScanner q = new MenuInputScanner(new String[] {"Play a card", "Take a card from the deck"});
-        q.setMessage("What do you want to do? ");
-
-        if (prompt.getUserInput(q) == 2) {
+        InputGetter q = new DrawOrPlay(this);
+        int input = q.getInput();
+        if (input == 2) {
             return new Choice(Choice.Type.TAKE_CARD);
         }
 
-        MenuInputScanner v = new MenuInputScanner(Utils.toStringArray(hand));
-        v.setMessage("Choose your card! ");
-        int input = prompt.getUserInput(v);
-
-        return new Choice(Choice.Type.PLAY_CARD, hand.get(input-1));
+        InputGetter v = new ChooseCard(this);
+        input = v.getInput();
+        return new Choice(Choice.Type.PLAY_CARD, hand.get(input));
 
 
+    }
+
+    public Prompt getPrompt() {
+        Utils.emptyStream(in);
+        return prompt;
     }
 
     public Color chooseColor() {
-        return null;
+        InputGetter getColor = new ChooseColor(this);
+        int input = getColor.getInput();
+        return Color.convertToCardColor(input);
     }
+
 
     public void giveCard(Card card) {
         hand.add(card);
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Card> getHand() {
         return this.hand;
     }
 
-    public int getInput(MenuInputScanner w) {
-        return prompt.getUserInput(w);
-    }
 }
