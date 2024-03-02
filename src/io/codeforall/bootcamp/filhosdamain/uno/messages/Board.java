@@ -7,41 +7,47 @@ import io.codeforall.bootcamp.filhosdamain.uno.game.cards.Card;
 public class Board implements Message {
     private final PlayerList players;
     private final Card topCard;
+    private final Player player;
 
-    public Board(PlayerList players, Card topCard) {
+
+    public Board(PlayerList players, Player player, Card topCard) {
         this.players = players;
         this.topCard = topCard;
+        this.player = player;
     }
 
     private String buildBoard() {
-        StringBuilder s  = new StringBuilder();
+        StringBuilder board = new StringBuilder();
 
+        board.append("\n".repeat(100));
 
-        String v = "" +
-                "                     PLAYERNAME" +
-                "                       🂡🂡🂡🂡🂡🂡🂡" +
-                "" +
-                "PLAYER2                                          PLAYER3" +
-                "🂡🂡🂡🂡🂡🂡🂡                {card}                   🂡🂡🂡🂡🂡🂡🂡" +
-                "" +
-                "" +
-                "                  ->   PLAYER4    <-" +
-                "                       🂡🂡🂡🂡🂡🂡🂡  "
+        // Add top card
+        board.append("\n          [").append(topCard.repr()).append("]\n\n");
 
-                ;
+        // Add player names and card counts
+        for (Player player : players) {
 
+            if (player.equals(this.player)) {
+                board.append("-> ");
+                board.append(player.getName());
+                board.append(" ".repeat(Math.max(0, 17 - player.getName().length())));
+                board.append("🂡 x").append(player.getHand().size()).append("\n");
+                continue;
+            }
 
-        return s.toString();
+            board.append(player.getName());
+            board.append(" ".repeat(Math.max(0, 20 - player.getName().length())));
+            board.append("🂡 x").append(player.getHand().size()).append("\n");
+        }
+
+        return board.toString();
     }
 
     @Override
     public void send() {
-        Thread t = new Thread(() -> {
-            String currentBoard = buildBoard();
-            for (Player p : players) {
-                p.getPrintStream().print(currentBoard);
-            }
-        });
-        t.start();
+        String currentBoard = buildBoard();
+        for (Player p : players) {
+            p.getPrintStream().print(currentBoard);
+        }
     }
 }
