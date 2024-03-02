@@ -2,7 +2,10 @@ package io.codeforall.bootcamp.filhosdamain.uno.server;
 
 import io.codeforall.bootcamp.filhosdamain.uno.game.Game;
 import io.codeforall.bootcamp.filhosdamain.uno.messages.Message;
+import org.academiadecodigo.bootcamp.Prompt;
+import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,21 +54,24 @@ public class Server {
 
     private void awaitCommands() {
         Thread t = new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
             boolean gameStarted = false;
-            while (!gameStarted) {
-                System.out.print("Command (help to list commands)?\n>> ");
+            Prompt prompt = new Prompt(System.in, System.out);
+            MenuInputScanner menu = new MenuInputScanner(new String[]{"Help", "Players", "Rules", "Start"});
+            menu.setMessage("Command?");
 
-                String command = scanner.nextLine().toLowerCase();
+            while (!gameStarted) {
+
+                int command = prompt.getUserInput(menu);
 
                 switch (command) {
-                    case "help" -> System.out.println(Message.SERVER_COMMAND_HELP);
-                    case "players" -> {
+                    case 1 -> System.out.println(Message.SERVER_COMMAND_HELP);
+                    case 2 -> {
                         for (Connection connection : connections) {
                             System.out.println(connection.getPlayerName());
                         }
                     }
-                    case "start" -> {
+                    case 3 -> System.out.println(Message.GAME_RULES);
+                    case 4 -> {
                         if (canStart()) {
                             startGame();
                             gameStarted = true;

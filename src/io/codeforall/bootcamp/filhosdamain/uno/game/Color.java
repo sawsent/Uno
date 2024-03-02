@@ -9,7 +9,8 @@ public enum Color {
     WHITE("\u001b[37m"),
     CYAN("\u001b[36m");
 
-    public static final String RESET = "\u001b[0m";
+    public static final String RESET = "\u001b[1;37m";
+    public static final String INFO = "\u001b[35m";
     public final String ANSI_CODE;
     Color(String colorCode) {
         this.ANSI_CODE = colorCode;

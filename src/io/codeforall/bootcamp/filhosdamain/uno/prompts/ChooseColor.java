@@ -13,9 +13,7 @@ public class ChooseColor implements InputGetter {
     }
 
     private String buildMessage() {
-        StringBuilder out = new StringBuilder(player.getName());
-        out.append(", what color do you want to be played next? \n");
-        return out.toString();
+        return "What color do you want to be played next? ";
     }
 
     private String[] buildOptions() {

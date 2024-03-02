@@ -1,7 +1,10 @@
 package io.codeforall.bootcamp.filhosdamain.uno.server;
 
 import io.codeforall.bootcamp.filhosdamain.uno.Utils;
+import io.codeforall.bootcamp.filhosdamain.uno.game.Color;
 import io.codeforall.bootcamp.filhosdamain.uno.messages.Message;
+import io.codeforall.bootcamp.filhosdamain.uno.messages.ShowIsReady;
+import io.codeforall.bootcamp.filhosdamain.uno.messages.ShowWelcome;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
@@ -35,16 +38,18 @@ public class Connection implements Runnable {
     @Override
     public void run() {
 
+        MessageSender.send(new ShowWelcome(out));
+
         StringInputScanner askName = new StringInputScanner();
         askName.setMessage("What is your name? \n>> ");
 
         String[] options = {"Ready up!", "Change Name", "Check Rules"};
         MenuInputScanner getCommand = new MenuInputScanner(options);
+        getCommand.setMessage("");
 
         Prompt prompt = new Prompt(in, out);
 
-        out.println("Hello! ");
-
+        out.println(Color.RESET);
         playerName = prompt.getUserInput(askName);
 
         while (true) {
@@ -52,6 +57,7 @@ public class Connection implements Runnable {
             int choice = prompt.getUserInput(getCommand);
             if (choice == 1) {
                 ready = true;
+                MessageSender.send(new ShowIsReady(out, playerName));
                 break;
             }
             switch (choice) {

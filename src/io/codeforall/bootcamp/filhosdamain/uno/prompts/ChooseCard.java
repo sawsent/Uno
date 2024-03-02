@@ -14,9 +14,7 @@ public class ChooseCard implements InputGetter {
     }
 
     private String buildMessage() {
-        StringBuilder out = new StringBuilder(player.getName());
-        out.append(", Choose the card you want to play! \n");
-        return out.toString();
+        return "Choose the card you want to play!";
     }
 
     private String[] buildOptions() {

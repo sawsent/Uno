@@ -5,7 +5,7 @@ public enum Effect {
     PLUS_4("+4"),
     SKIP_TURN("X"),
     REVERSE("R"),
-    SET_COLOR("SC"),
+    SET_COLOR("C"),
     NO_EFFECT(":D");
     public final String repr;
     Effect(String repr) {
