@@ -18,7 +18,7 @@ public class Connection implements Runnable {
     public final InputStream in;
     public final PrintStream out;
     private boolean ready = false;
-    private String playerName = "placeholder";
+    private String playerName = "_____________________";
 
 
     public Connection(Socket socket) throws IOException {
@@ -41,7 +41,7 @@ public class Connection implements Runnable {
         MessageSender.send(new ShowWelcome(out));
 
         StringInputScanner askName = new StringInputScanner();
-        askName.setMessage("What is your name? \n>> ");
+        askName.setMessage("What is your name? (Maximum 15 characters) \n>> ");
 
         String[] options = {"Ready up!", "Change Name", "Check Rules"};
         MenuInputScanner getCommand = new MenuInputScanner(options);
@@ -50,7 +50,11 @@ public class Connection implements Runnable {
         Prompt prompt = new Prompt(in, out);
 
         out.println(Color.RESET);
-        playerName = prompt.getUserInput(askName);
+
+        while (playerName.length() > 15) {
+            playerName = prompt.getUserInput(askName);
+        }
+
 
         while (true) {
 
@@ -61,7 +65,11 @@ public class Connection implements Runnable {
                 break;
             }
             switch (choice) {
-                case 2 -> playerName = prompt.getUserInput(askName);
+                case 2 -> {
+                    do {
+                        playerName = prompt.getUserInput(askName);
+                    } while (playerName.length() > 15);
+                }
                 case 3 -> out.print(Message.GAME_RULES);
             }
         }

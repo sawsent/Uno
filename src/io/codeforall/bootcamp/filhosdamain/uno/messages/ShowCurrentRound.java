@@ -14,6 +14,9 @@ public class ShowCurrentRound implements Message {
 
     @Override
     public void send() {
+
+        System.out.println(Color.INFO + "\n\n\nSTART OF TURN " + currentRound + Color.RESET + "\n");
+
         for (Player p : players) {
             p.getPrintStream().print(Color.INFO + "START OF TURN " + currentRound + Color.RESET + "\n");
         }

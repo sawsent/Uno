@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Player {
-
+    public static final Player impossiblePlayer = new Player("the one who is nobody but at the same time exists always", System.in, System.out);
     private final List<Card> hand = new LinkedList<>();
     private final PrintStream out;
     private final InputStream in;

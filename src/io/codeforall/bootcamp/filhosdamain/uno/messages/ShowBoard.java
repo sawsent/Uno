@@ -31,13 +31,13 @@ public class ShowBoard implements Message {
                 board.append("-> ");
                 board.append(Color.GREEN.ANSI_CODE + ((p == player) ? "YOU" : p.getName()) + Color.RESET);
                 board.append(" ".repeat(Math.max(0, 17 - ((p == player) ? 3 : p.getName().length()))));
-                board.append("🂡 ").append((p.getHand().size() > 4 & p != player) ? "4+" : ("x" + p.getHand().size())).append("\n");
+                board.append("🂡 ").append((p.getHand().size() > 4 & p != player && player != Player.impossiblePlayer) ? "4+" : ("x" + p.getHand().size())).append("\n");
                 continue;
             }
             board.append("   ");
             board.append(((p == player) ? "YOU" : p.getName()));
             board.append(" ".repeat(Math.max(0, 17 - ((p == player) ? 3 : p.getName().length()))));
-            board.append("🂡 ").append((p.getHand().size() > 4 && p != player) ? "4+" : ("x" + p.getHand().size())).append("\n");
+            board.append("🂡 ").append((p.getHand().size() > 4 && p != player && player != Player.impossiblePlayer) ? "4+" : ("x" + p.getHand().size())).append("\n");
         }
 
         board.append("\n   Top Card -> [").append(topCard.repr()).append("]\n");
@@ -52,6 +52,8 @@ public class ShowBoard implements Message {
     @Override
     public void send() {
         if (mode.equals("all")) {
+
+            System.out.println(buildBoard(Player.impossiblePlayer));
 
             for (Player p : players) {
                 if (p.equals(currentPlayer)) {
