@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="prompt-view">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/prompt-view.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
