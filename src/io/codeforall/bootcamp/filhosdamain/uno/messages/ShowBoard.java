@@ -1,5 +1,6 @@
 package io.codeforall.bootcamp.filhosdamain.uno.messages;
 
+import io.codeforall.bootcamp.filhosdamain.uno.Utils;
 import io.codeforall.bootcamp.filhosdamain.uno.game.Color;
 import io.codeforall.bootcamp.filhosdamain.uno.game.Player;
 import io.codeforall.bootcamp.filhosdamain.uno.game.PlayerList;
@@ -10,61 +11,40 @@ import java.util.LinkedList;
 public class ShowBoard implements Message {
     private final LinkedList<Player> players = new LinkedList<>();
     private final Card topCard;
-    private final Player player;
+    private final Player currentPlayer;
     private final String mode;
 
 
     public ShowBoard(PlayerList players, Player player, Card topCard, String mode) {
         this.players.addAll(players);
         this.topCard = topCard;
-        this.player = player;
+        this.currentPlayer = player;
         this.mode = mode;
     }
 
-    private String buildBoardForCurrentPlayer() {
+    private String buildBoard(Player player) {
         StringBuilder board = new StringBuilder();
 
-        for (Player player : players) {
+        for (Player p : players) {
 
-            if (player.equals(this.player)) {
+            if (p.equals(this.currentPlayer)) {
                 board.append("-> ");
-                board.append(Color.GREEN.ANSI_CODE + "YOU" + Color.RESET);
-                board.append(" ".repeat(Math.max(0, 17 - player.getName().length())));
-                board.append("🂡 ").append((player.getHand().size() > 4) ? "4+" : ("x" + player.getHand().size())).append("\n");
+                board.append(Color.GREEN.ANSI_CODE + ((p == player) ? "YOU" : p.getName()) + Color.RESET);
+                board.append(" ".repeat(Math.max(0, 17 - ((p == player) ? 3 : p.getName().length()))));
+                board.append("🂡 ").append((p.getHand().size() > 4 & p != player) ? "4+" : ("x" + p.getHand().size())).append("\n");
                 continue;
             }
-
-            board.append(player.getName());
-            board.append(" ".repeat(Math.max(0, 20 - player.getName().length())));
-            board.append("🂡 ").append((player.getHand().size() > 4) ? "4+" : ("x" + player.getHand().size())).append("\n");
+            board.append("   ");
+            board.append(((p == player) ? "YOU" : p.getName()));
+            board.append(" ".repeat(Math.max(0, 17 - ((p == player) ? 3 : p.getName().length()))));
+            board.append("🂡 ").append((p.getHand().size() > 4 && p != player) ? "4+" : ("x" + p.getHand().size())).append("\n");
         }
 
         board.append("\n   Top Card -> [").append(topCard.repr()).append("]\n");
-        board.append(ShowHand.getPlayerHand(player));
 
-        return board.toString();
-    }
-
-
-    private String buildBoard() {
-        StringBuilder board = new StringBuilder();
-
-        for (Player player : players) {
-
-            if (player.equals(this.player)) {
-                board.append("-> ");
-                board.append(Color.GREEN.ANSI_CODE + player.getName() + Color.RESET);
-                board.append(" ".repeat(Math.max(0, 17 - player.getName().length())));
-                board.append("🂡 ").append((player.getHand().size() > 4) ? "4+" : ("x" + player.getHand().size())).append("\n");
-                continue;
-            }
-
-            board.append(player.getName());
-            board.append(" ".repeat(Math.max(0, 20 - player.getName().length())));
-            board.append("🂡 ").append((player.getHand().size() > 4) ? "4+" : ("x" + player.getHand().size())).append("\n");
+        if (currentPlayer == player) {
+            board.append("\n" + ShowHand.getPlayerHand(player));
         }
-
-        board.append("\n   Top Card -> [").append(topCard.repr()).append("]\n");
 
         return board.toString();
     }
@@ -72,15 +52,15 @@ public class ShowBoard implements Message {
     @Override
     public void send() {
         if (mode.equals("all")) {
-            String currentBoard = buildBoard();
+
             for (Player p : players) {
-                if (p.equals(player)) {
+                if (p.equals(currentPlayer)) {
                     continue;
                 }
-                p.getPrintStream().print(currentBoard);
+                p.getPrintStream().print(buildBoard(p));
             }
         }
-        player.getPrintStream().print(buildBoardForCurrentPlayer());
+        currentPlayer.getPrintStream().print(buildBoard(currentPlayer));
     }
 
 }

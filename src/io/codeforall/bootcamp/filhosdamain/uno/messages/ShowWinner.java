@@ -24,9 +24,9 @@ public class ShowWinner implements Message {
                 if (p.equals(winner)) {
                     continue;
                 }
-                p.getPrintStream().print(Color.CYAN.ANSI_CODE + winner.getName() + "HAS WON!!" + Color.RESET);
+                p.getPrintStream().print(Color.CYAN.ANSI_CODE + winner.getName().toUpperCase() + " HAS WON!!🎉🎊🎉🎊" + Color.RESET);
             }
         }
-        winner.getPrintStream().print(Color.CYAN.ANSI_CODE + "YOU WON!! 🎉🎊" + Color.RESET);
+        winner.getPrintStream().print(Color.CYAN.ANSI_CODE + " YOU WON!! 🎉🎊🎉🎊🎉🎊" + Color.RESET);
     }
 }

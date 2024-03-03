@@ -51,11 +51,13 @@ public class DeckFactory {
     }
 
     public static LinkedList<Card> getShuffledDeck(int nrOfPlayers) {
+
         LinkedList<Card> deck = getDeck(nrOfPlayers);
         Collections.shuffle(deck);
         while (deck.getFirst().getAfterPlayEffect() == SET_COLOR) {
             deck.addLast(deck.removeFirst());
         }
         return deck;
+
     }
 }

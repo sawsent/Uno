@@ -22,16 +22,24 @@ public class ShowGameStarted implements Message {
 
     private String getOrderedPlayersString(Player player) {
         StringBuilder builder = new StringBuilder();
+
         if (player.equals(players.get(0))) {
             builder.append(Color.GREEN.ANSI_CODE);
-            builder.append(players.get(0).getName());
+            builder.append("YOU");
             builder.append(defaultColor);
+        } else {
+            builder.append(players.get(0).getName());
         }
-
 
         for (int i = 1; i < players.size(); i++) {
             builder.append(" -> ");
-            builder.append(players.get(i).getName());
+            if (player.equals(players.get(i))) {
+                builder.append(Color.GREEN.ANSI_CODE);
+                builder.append("YOU");
+                builder.append(defaultColor);
+            } else {
+                builder.append(players.get(i).getName());
+            }
         }
         builder.append(".");
         return builder.toString();

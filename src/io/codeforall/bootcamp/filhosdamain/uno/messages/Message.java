@@ -3,7 +3,7 @@ package io.codeforall.bootcamp.filhosdamain.uno.messages;
 import io.codeforall.bootcamp.filhosdamain.uno.game.Color;
 
 public interface Message {
-    String SERVER_COMMAND_HELP = "'help': lists all commands\n'start': starts the game with the current number of players\n'players': lists all connected players and their names";
+    String SERVER_COMMAND_HELP = "-> 'help': lists all commands\n-> 'players': lists all connected players and their names\n-> 'rules': shows the rules for the game\n-> 'start': starts the game with the current number of players (all need to be ready)\n";
     String GAME_RULES =
             "Rules:\n" +
             Color.INFO + "Objective:\n" + Color.RESET +

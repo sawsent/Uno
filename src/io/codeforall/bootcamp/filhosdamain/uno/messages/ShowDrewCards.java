@@ -16,11 +16,11 @@ public class ShowDrewCards implements Message {
     }
 
     private String buildMessage(Player player, int cardsDrawn) {
-        return player.getName() + " drew " + cardsDrawn + " cards.\n";
+        return Color.INFO + player.getName() + " drew " + cardsDrawn + ((cardsDrawn == 1) ? " card.\n" : " cards.\n") + Color.RESET;
     }
 
     private String buildMessageForCurrentPlayer(int cardsDrawn) {
-        return Color.GREEN.ANSI_CODE + "YOU" + Color.RESET + "drew " + cardsDrawn + ((cardsDrawn == 1) ? " card.\n" : " cards.\n");
+        return Color.GREEN.ANSI_CODE + "YOU " + Color.INFO + "drew " + cardsDrawn + ((cardsDrawn == 1) ? " card.\n" : " cards.\n") + Color.RESET;
     }
 
 

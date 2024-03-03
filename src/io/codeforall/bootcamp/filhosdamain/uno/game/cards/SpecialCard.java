@@ -42,4 +42,10 @@ public class SpecialCard implements Card {
     public String repr() {
         return color.ANSI_CODE + ((beforePlayEffect == Effect.NO_EFFECT) ? afterPlayEffect.repr : beforePlayEffect.repr) + Color.RESET;
     }
+
+    public void refresh() {
+        if (afterPlayEffect == Effect.SET_COLOR) {
+            setColor(Color.BLACK);
+        }
+    }
 }

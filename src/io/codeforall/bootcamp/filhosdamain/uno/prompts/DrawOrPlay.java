@@ -23,7 +23,7 @@ public class DrawOrPlay implements InputGetter {
 
     private String buildMessage() {
         StringBuilder out = new StringBuilder();
-        out.append("Do you want to");
+        out.append("Do you want to ");
         out.append(Color.RED.ANSI_CODE).append("draw").append(Color.RESET);
         out.append(" or ");
         out.append(Color.GREEN.ANSI_CODE).append("play").append(Color.RESET);

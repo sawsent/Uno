@@ -1,11 +1,12 @@
 package io.codeforall.bootcamp.filhosdamain.uno.server;
 
+import io.codeforall.bootcamp.filhosdamain.uno.game.Color;
 import io.codeforall.bootcamp.filhosdamain.uno.game.Game;
 import io.codeforall.bootcamp.filhosdamain.uno.messages.Message;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.menu.MenuInputScanner;
 
-import java.awt.*;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -56,7 +57,7 @@ public class Server {
         Thread t = new Thread(() -> {
             boolean gameStarted = false;
             Prompt prompt = new Prompt(System.in, System.out);
-            MenuInputScanner menu = new MenuInputScanner(new String[]{"Help", "Players", "Rules", "Start"});
+            MenuInputScanner menu = new MenuInputScanner(new String[]{"Players (Show all connected players. GREEN means ready, RED means not ready)", "Rules: display the rules of the game", "Start: start the game with the current number of players (all need to be ready)"});
             menu.setMessage("Command?");
 
             while (!gameStarted) {
@@ -64,14 +65,16 @@ public class Server {
                 int command = prompt.getUserInput(menu);
 
                 switch (command) {
-                    case 1 -> System.out.println(Message.SERVER_COMMAND_HELP);
-                    case 2 -> {
+                    case 1 -> {
+                        if (connections.size() == 0) {
+                            System.out.println("No players have joined yet! ");
+                        }
                         for (Connection connection : connections) {
-                            System.out.println(connection.getPlayerName());
+                            System.out.println(((connection.isReady()) ? Color.GREEN.ANSI_CODE : Color.RED.ANSI_CODE) + "-> " + connection.getPlayerName() + Color.RESET);
                         }
                     }
-                    case 3 -> System.out.println(Message.GAME_RULES);
-                    case 4 -> {
+                    case 2 -> System.out.println(Message.GAME_RULES);
+                    case 3 -> {
                         if (canStart()) {
                             startGame();
                             gameStarted = true;
@@ -108,8 +111,10 @@ public class Server {
     private void startGame() {
         Thread t = new Thread(() -> {
             this.game = new Game();
+            System.out.println("Game starting. The players playing are: ");
             for (Connection c : connections) {
                 game.addPlayer(c.getPlayerName(), c.in, c.out);
+                System.out.println(c.getPlayerName());
             }
             game.run();
         });

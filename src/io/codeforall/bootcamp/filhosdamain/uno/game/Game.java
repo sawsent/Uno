@@ -23,6 +23,7 @@ public class Game {
 
     private PlayerList players = new PlayerList();
     private LinkedList<Card> deck;
+    private Card firstPlayedCard;
     private final Verifier verifier = new Verifier();
 
     private Effect beforePlayEffect = Effect.NO_EFFECT;
@@ -43,13 +44,15 @@ public class Game {
     public void run() {
         prepare();
 
-
+        int currentRound = 0;
 
         while (!gameEnded) {
+
             for (Player player : players) {
 
+                currentRound++;
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -58,7 +61,8 @@ public class Game {
                 restriction = NO_RESTRICTION;
                 topCard = deck.getFirst();
 
-                MessageSender.send(new ClearTerminal(players), new ShowBoard(players, player, topCard, "all"));
+
+                MessageSender.send(new ClearTerminal(players), new ShowCurrentRound(players, currentRound), new ShowBoard(players, player, topCard, "all"));
 
                 if (manageBeforePlayEffect(player)) {
                     continue;
@@ -141,7 +145,7 @@ public class Game {
 
     private boolean tookPlus4(Player player) {
         if (verifier.hasPlusFour(player)) {
-            InputGetter w = new DrawOrPlay(player, 4, "+4");
+            InputGetter w = new DrawOrPlay(player, cardsToEat, "+4");
             return w.getInput() == 2;
         }
         return true;
@@ -149,7 +153,7 @@ public class Game {
 
     private boolean tookPlus2(Player player) {
         if (verifier.hasPlusTwo(player)) {
-            InputGetter w = new DrawOrPlay(player, 2, "+2");
+            InputGetter w = new DrawOrPlay(player, cardsToEat, "+2");
             return w.getInput() == 2;
         }
         return true;
@@ -173,8 +177,8 @@ public class Game {
                 continue;
             }
 
-            if (player.getHand().size() < 40 && canDraw && deck.size() > 1) {
-                player.giveCard(deck.removeLast());
+            if (deck.size() > 1 && canDraw) {
+                giveCards(player, 1);
 
                 MessageSender.send(new ClearTerminal(player), new ShowBoard(players, player, topCard, "solo"), new ShowDrewCards(players, player, 1));
                 continue;
@@ -187,7 +191,18 @@ public class Game {
 
     private void giveCards(Player player, int amount) {
         for (int i = 0; i < amount; i++) {
-            player.giveCard(deck.removeLast());
+
+            if (deck.getLast() == firstPlayedCard) {
+                reshuffleDeck();
+            }
+
+            if (deck.size() > 1) {
+                if (deck.getLast() instanceof SpecialCard specialCard) {
+                    specialCard.refresh();
+                }
+                player.giveCard(deck.removeLast());
+            }
+
         }
     }
 
@@ -195,11 +210,21 @@ public class Game {
     private void prepare() {
 
         deck = DeckFactory.getShuffledDeck(players.size());
-
         Collections.shuffle(players);
+
         assignInitialCards();
 
+        firstPlayedCard = deck.getFirst();
+
         MessageSender.send(new ShowGameStarted(players));
+
+    }
+
+    private void reshuffleDeck() {
+        firstPlayedCard = deck.removeFirst();
+
+        Collections.shuffle(deck);
+        deck.addFirst(firstPlayedCard);
 
     }
 
