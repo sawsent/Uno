@@ -1,6 +1,5 @@
 # Uno
 
-## About This Project
 Jump into a quick-paced game of Uno right from your terminal! This online Uno clone was crafted as a spirited 2-day coding challenge during the CodeForAll Fullstack bootcamp. The project served as a practical exercise in multi-threaded programming, server management, socket communication, and networking. Ready to challenge your friends and maybe lose a few? Jump in and scream UNO!
 
 ## How to Play
